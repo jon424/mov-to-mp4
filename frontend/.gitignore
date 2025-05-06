@@ -7,6 +7,9 @@ node_modules/
 /dist
 /build
 
+# Local docs
+frontend\DOCS-FOR-ME.md
+
 # Environment files
 .env
 .env.local
