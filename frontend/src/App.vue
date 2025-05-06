@@ -11,7 +11,7 @@
           @load="onImageLoad"
         />
       </div>
-      <h1>.mov to .mp4 Converter</h1>
+      <h1>.MOV to .MP4 Converter</h1>
       <div class="upload-section">
         <div class="file-input-wrapper">
           <input 
