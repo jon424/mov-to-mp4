@@ -1,7 +1,7 @@
 <template>
   <div class="container" :class="timeOfDay">
     <h2 class="greeting fade-in">{{ greeting }}</h2>
-    <p class="subtitle fade-in delay-1">Convert your .mov files to .mp4 format with ease</p>
+    <p class="subtitle fade-in delay-1">Convert your .mov files to .mp4 format with ease??</p>
     <div class="converter-card fade-in delay-2">
       <div class="animated-image">
         <img 
