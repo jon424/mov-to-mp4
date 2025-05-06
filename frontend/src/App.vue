@@ -1,5 +1,7 @@
 <template>
-  <div class="container">
+  <div class="container" :class="timeOfDay">
+    <h2 class="greeting">{{ greeting }}</h2>
+    <p class="subtitle">Convert your .mov files to .mp4 format with ease</p>
     <div class="converter-card">
       <div class="animated-image">
         <img 
@@ -70,6 +72,20 @@ const downloadSectionTitle = computed(() => {
   if (isUploading.value) return 'Converting...'
   if (downloadUrl.value) return 'Conversion Complete!'
   return 'Ready to Convert'
+})
+
+const timeOfDay = computed(() => {
+  const hour = new Date().getHours()
+  if (hour >= 5 && hour < 12) return 'morning'
+  if (hour >= 12 && hour < 18) return 'afternoon'
+  return 'evening'
+})
+
+const greeting = computed(() => {
+  const hour = new Date().getHours()
+  if (hour >= 5 && hour < 12) return 'Good morning! 🌞'
+  if (hour >= 12 && hour < 18) return 'Good afternoon! 😎'
+  return 'Good evening! 🌛'
 })
 
 function onImageLoad() {
@@ -149,14 +165,82 @@ async function convert() {
 }
 </script>
 
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+</style>
+
 <style scoped>
 .container {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 20px;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  transition: background 1s ease;
+}
+
+.container.morning {
+  background: linear-gradient(180deg, #FFB6C1 0%, #87CEEB 100%);
+}
+
+.container.afternoon {
+  background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 100%);
+}
+
+.container.evening {
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.container.evening::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #fff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 50px 160px, #fff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 160px 120px, #fff, rgba(0,0,0,0));
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  opacity: 0.5;
+  z-index: 1;
+}
+
+.greeting {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 2;
+}
+
+.container.morning .greeting {
+  color: #2c3e50;
+}
+
+.container.afternoon .greeting {
+  color: #2c3e50;
+}
+
+.container.evening .greeting {
+  color: #fff;
 }
 
 .converter-card {
@@ -166,6 +250,8 @@ async function convert() {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 600px;
+  position: relative;
+  z-index: 2;
 }
 
 .animated-image {
@@ -357,5 +443,29 @@ h1 {
   .download-section {
     padding: 1rem;
   }
+}
+
+.subtitle {
+  color: white;
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+.container.morning .subtitle {
+  color: #2c3e50;
+}
+
+.container.afternoon .subtitle {
+  color: #2c3e50;
+}
+
+.container.evening .subtitle {
+  color: #fff;
 }
 </style>
