@@ -7,27 +7,37 @@
       <div class="progress-bar" :style="{ width: uploadProgress + '%' }"></div>
       <span class="progress-text">{{ uploadProgress }}%</span>
     </div>
-    <div v-if="downloadUrl" class="download-section">
-      <h3>Conversion Complete!</h3>
-      <a :href="downloadUrl" download="converted.mp4" class="download-link">
-        Download Converted File
-      </a>
+    <div class="download-section" :class="{ 'converting': isUploading }">
+      <h3>{{ downloadSectionTitle }}</h3>
+      <div v-if="downloadUrl" class="download-content">
+        <a :href="downloadUrl" download="converted.mp4" class="download-link">
+          Download Converted File
+        </a>
+      </div>
+      <div v-else class="placeholder-content">
+        <p>Your converted file will appear here</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 const file = ref<File | null>(null)
 const uploadProgress = ref(0)
 const isUploading = ref(false)
 const downloadUrl = ref<string | null>(null)
 
+const downloadSectionTitle = computed(() => {
+  if (isUploading.value) return 'Converting...'
+  if (downloadUrl.value) return 'Conversion Complete!'
+  return 'Ready to Convert'
+})
+
 function handleFileUpload(event: Event) {
   const target = event.target as HTMLInputElement
   if (target.files && target.files.length > 0) {
     file.value = target.files[0]
-    // Reset download URL when new file is selected
     downloadUrl.value = null
   }
 }
@@ -112,6 +122,15 @@ async function convert() {
   background-color: #f8f9fa;
   border-radius: 8px;
   text-align: center;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.download-section.converting {
+  background-color: #e8f5e9;
 }
 
 .download-section h3 {
@@ -131,5 +150,14 @@ async function convert() {
 
 .download-link:hover {
   background-color: #45a049;
+}
+
+.placeholder-content {
+  color: #666;
+  font-style: italic;
+}
+
+.placeholder-content p {
+  margin: 0;
 }
 </style>
