@@ -52,6 +52,7 @@ const file = ref<File | null>(null)
 const uploadProgress = ref(0)
 const isUploading = ref(false)
 const downloadUrl = ref<string | null>(null)
+const currentFileId = ref<string | null>(null)
 
 const downloadSectionTitle = computed(() => {
   if (isUploading.value) return 'Converting...'
@@ -64,6 +65,18 @@ function handleFileUpload(event: Event) {
   if (target.files && target.files.length > 0) {
     file.value = target.files[0]
     downloadUrl.value = null
+  }
+}
+
+async function checkConversionProgress() {
+  if (!currentFileId.value) return
+  
+  try {
+    const response = await fetch(`http://localhost:3000/progress/${currentFileId.value}`)
+    const data = await response.json()
+    uploadProgress.value = data.progress
+  } catch (error) {
+    console.error('Failed to check progress:', error)
   }
 }
 
@@ -82,13 +95,28 @@ async function convert() {
       
       xhr.upload.addEventListener('progress', (event) => {
         if (event.lengthComputable) {
-          uploadProgress.value = Math.round((event.loaded * 100) / event.total)
+          // Only show upload progress up to 80%
+          uploadProgress.value = Math.round((event.loaded * 80) / event.total)
         }
       })
 
       xhr.addEventListener('load', () => {
         if (xhr.status >= 200 && xhr.status < 300) {
-          resolve(xhr.response)
+          // Get the file ID from the response headers
+          const fileId = xhr.getResponseHeader('X-File-Id')
+          if (fileId) {
+            currentFileId.value = fileId
+            // Start polling for conversion progress
+            const progressInterval = setInterval(async () => {
+              await checkConversionProgress()
+              if (uploadProgress.value >= 100) {
+                clearInterval(progressInterval)
+                resolve(xhr.response)
+              }
+            }, 1000)
+          } else {
+            resolve(xhr.response)
+          }
         } else {
           reject(new Error(`Upload failed with status ${xhr.status}`))
         }
@@ -110,6 +138,7 @@ async function convert() {
     alert('Upload failed. Please try again.')
   } finally {
     isUploading.value = false
+    currentFileId.value = null
   }
 }
 </script>
@@ -216,9 +245,9 @@ h1 {
 .progress-container {
   margin: 1.5rem 0;
   width: 100%;
-  height: 8px;
+  height: 12px;
   background-color: #f0f0f0;
-  border-radius: 4px;
+  border-radius: 6px;
   overflow: hidden;
   position: relative;
 }
@@ -235,7 +264,7 @@ h1 {
   left: 50%;
   transform: translate(-50%, -50%);
   color: #000;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 500;
 }
 
