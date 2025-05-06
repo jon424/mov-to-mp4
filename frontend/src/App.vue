@@ -1,8 +1,8 @@
 <template>
   <div class="container" :class="timeOfDay">
-    <h2 class="greeting">{{ greeting }}</h2>
-    <p class="subtitle">Convert your .mov files to .mp4 format with ease</p>
-    <div class="converter-card">
+    <h2 class="greeting fade-in">{{ greeting }}</h2>
+    <p class="subtitle fade-in delay-1">Convert your .mov files to .mp4 format with ease</p>
+    <div class="converter-card fade-in delay-2">
       <div class="animated-image">
         <img 
           :src="currentImage" 
@@ -470,5 +470,29 @@ h1 {
 
 .container.evening .subtitle {
   color: #fff;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.delay-1 {
+  animation-delay: 0.2s;
+}
+
+.delay-2 {
+  animation-delay: 0.4s;
 }
 </style>
