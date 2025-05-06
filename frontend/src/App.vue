@@ -6,7 +6,7 @@
       <div class="animated-image">
         <img 
           :src="currentImage" 
-          alt="Benny" 
+          alt="Benny The Dog" 
           class="header-image"
           @load="onImageLoad"
         />
@@ -149,7 +149,7 @@ async function convert() {
         reject(new Error('Upload failed'))
       })
 
-      xhr.open('POST', 'http://localhost:3000/upload')
+      xhr.open('POST', import.meta.env.VITE_API_URL || 'http://localhost:3000/upload')
       xhr.responseType = 'blob'
       xhr.send(formData)
     })
