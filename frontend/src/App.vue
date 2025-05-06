@@ -1,6 +1,14 @@
 <template>
   <div class="container">
     <div class="converter-card">
+      <div class="animated-image">
+        <img 
+          :src="currentImage" 
+          alt="Benny" 
+          class="header-image"
+          @load="onImageLoad"
+        />
+      </div>
       <h1>.mov to .mp4 Converter</h1>
       <div class="upload-section">
         <div class="file-input-wrapper">
@@ -47,12 +55,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import benny1 from './img/benny-1.png'
+import benny2 from './img/benny-2.png'
+
 const file = ref<File | null>(null)
 const uploadProgress = ref(0)
 const isUploading = ref(false)
 const downloadUrl = ref<string | null>(null)
-const currentFileId = ref<string | null>(null)
+const currentImage = ref(benny1)
+let animationInterval: number | null = null
 
 const downloadSectionTitle = computed(() => {
   if (isUploading.value) return 'Converting...'
@@ -60,23 +72,33 @@ const downloadSectionTitle = computed(() => {
   return 'Ready to Convert'
 })
 
+function onImageLoad() {
+  // Ensure smooth transition between images
+  const img = document.querySelector('.header-image') as HTMLImageElement
+  if (img) {
+    img.style.opacity = '1'
+  }
+}
+
+onMounted(() => {
+  // Start the animation
+  animationInterval = window.setInterval(() => {
+    currentImage.value = currentImage.value === benny1 ? benny2 : benny1
+  }, 500)
+})
+
+onUnmounted(() => {
+  // Clean up the animation interval
+  if (animationInterval) {
+    clearInterval(animationInterval)
+  }
+})
+
 function handleFileUpload(event: Event) {
   const target = event.target as HTMLInputElement
   if (target.files && target.files.length > 0) {
     file.value = target.files[0]
     downloadUrl.value = null
-  }
-}
-
-async function checkConversionProgress() {
-  if (!currentFileId.value) return
-  
-  try {
-    const response = await fetch(`http://localhost:3000/progress/${currentFileId.value}`)
-    const data = await response.json()
-    uploadProgress.value = data.progress
-  } catch (error) {
-    console.error('Failed to check progress:', error)
   }
 }
 
@@ -95,28 +117,13 @@ async function convert() {
       
       xhr.upload.addEventListener('progress', (event) => {
         if (event.lengthComputable) {
-          // Only show upload progress up to 80%
           uploadProgress.value = Math.round((event.loaded * 80) / event.total)
         }
       })
 
       xhr.addEventListener('load', () => {
         if (xhr.status >= 200 && xhr.status < 300) {
-          // Get the file ID from the response headers
-          const fileId = xhr.getResponseHeader('X-File-Id')
-          if (fileId) {
-            currentFileId.value = fileId
-            // Start polling for conversion progress
-            const progressInterval = setInterval(async () => {
-              await checkConversionProgress()
-              if (uploadProgress.value >= 100) {
-                clearInterval(progressInterval)
-                resolve(xhr.response)
-              }
-            }, 1000)
-          } else {
-            resolve(xhr.response)
-          }
+          resolve(xhr.response)
         } else {
           reject(new Error(`Upload failed with status ${xhr.status}`))
         }
@@ -138,7 +145,6 @@ async function convert() {
     alert('Upload failed. Please try again.')
   } finally {
     isUploading.value = false
-    currentFileId.value = null
   }
 }
 </script>
@@ -160,6 +166,20 @@ async function convert() {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 600px;
+}
+
+.animated-image {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto 2rem;
+  display: block;
+}
+
+.header-image {
+  width: 100%;
+  height: auto;
+  transition: opacity 0.1s ease;
+  opacity: 0;
 }
 
 h1 {
