@@ -3,14 +3,7 @@
     <h2 class="greeting fade-in">{{ greeting }}</h2>
     <p class="subtitle fade-in delay-1">Convert your .mov files to .mp4 format with ease</p>
     <div class="converter-card fade-in delay-2">
-      <div class="animated-image">
-        <img 
-          :src="currentImage" 
-          alt="Benny The Dog" 
-          class="header-image"
-          @load="onImageLoad"
-        />
-      </div>
+      <div class="animated-image" :style="{ backgroundImage: `url(${currentImage})` }"></div>
       <h1>.MOV to .MP4 Converter</h1>
       <div class="upload-section">
         <div class="file-input-wrapper">
@@ -100,7 +93,7 @@ onMounted(() => {
   // Start the animation
   animationInterval = window.setInterval(() => {
     currentImage.value = currentImage.value === benny1 ? benny2 : benny1
-  }, 500)
+  }, 1000)
 })
 
 onUnmounted(() => {
@@ -262,6 +255,11 @@ body {
   max-width: 300px;
   margin: 0 auto 2rem;
   display: block;
+  position: relative;
+  height: 150px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .header-image {
